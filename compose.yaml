@@ -1,0 +1,69 @@
+version: "3.8"
+
+services:
+  mysql:
+    image: mysql:8.3
+    container_name: rbac-db
+    environment:
+      - MYSQL_ROOT_PASSWORD=secret
+      - MYSQL_DATABASE=rbac
+    restart: always
+    healthcheck:
+      test: ["CMD", "mysqladmin", "ping", "-h", "localhost"]
+      interval: 10s
+      timeout: 8s
+      retries: 5
+    networks:
+      - rbac-net
+
+  redis:
+    image: redis:alpine
+    container_name: rbac-cache
+    networks:
+      - rbac-net
+  
+  migrate:
+    build: ./api
+    depends_on:
+      mysql:
+        condition: service_healthy
+    command: php artisan migrate
+    networks:
+     - rbac-net
+  
+  api:
+    build: ./api
+    ports:
+    - 8321:8000
+    environment:
+      - MYSQL_HOST=mysql
+    depends_on:
+    - mysql
+    container_name: rbac-api
+    networks:
+      - rbac-net
+          
+    develop:
+      watch:
+        - action: sync
+          path: ./api
+          target: /app
+          ignore:
+            - ./app/vendor/
+            - ./app/.idea
+        - action: rebuild
+          path: composer.json
+    
+  mail-worker:
+    build: ./api
+    command: php artisan queue:work --queue=mail --tries=3
+    depends_on:
+      - mysql
+      - redis
+    networks:
+      - rbac-net
+  
+networks:
+  rbac-net:
+    driver: bridge
+  
