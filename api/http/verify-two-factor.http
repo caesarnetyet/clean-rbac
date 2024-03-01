@@ -1,0 +1,7 @@
+PATCH http://localhost:8000/api/verify-two-factor/1?expires=1709322184&signature=e150dbf710454e6290c362da66b093cc066c592a6c51100118c28ca11ee2d29c
+Accept: application/json
+Content-Type: application/json
+
+{
+"token": "8060"
+}

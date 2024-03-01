@@ -2,41 +2,125 @@
 
 namespace App\Http\Controllers;
 
+use App\Http\Requests\LoginRequest;
+use App\Http\Requests\RegisterRequest;
+use App\Mail\auth\EmailVerification;
 use App\Models\User;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Facades\Mail;
+use Illuminate\Support\Facades\URL;
 
 class AuthController extends Controller
 {
 
-    public function login(Request $request)
+    public function login(LoginRequest $request): \Illuminate\Http\JsonResponse
     {
-        $validated = $request->validate([
-            'email' => 'required|email',
-            'password' => 'required'
-        ]);
+        Log::info("Login attempt", ["ip" => $request->ip()]);
 
-        if (auth()->attempt($validated)) {
-            $token = auth()->user()->createToken('authToken')->accessToken;
-            return response(['token' => $token], 200);
+        // validar los datos de entrada
+        $validated = $request->validated();
+
+        try {
+            // intentar iniciar sesión
+            if (!auth()->attempt($validated)) {
+                Log::alert("Failed login attempt", ["ip" => $request->ip(), "email" => $request->email]);
+                return response()->json([
+                    'message' => 'Credenciales incorrectas',
+                ], 401); // 401 Unauthorized
+            }
+
+        } catch (\PDOException $e) {
+            Log::error("Database error", ["ip" => $request->ip(), "email" => $request->email, "error" => $e->getMessage()]);
+            return response()->json([
+                'message' => 'Error en el sistema',
+            ], 500); // 500 Internal Server Error
         }
-        return response(['error' => 'Invalid Credentials'], 401);
 
+        // verificar si el usuario está activo
+        if (!auth()->user()->email_verified_at) {
+            Log::alert("Inactive user login attempt", ["ip" => $request->ip(), "email" => $request->email]);
+            // enviar correo de verificación nuevamente
+            auth()->user()->sendEmailVerification();
+
+            return response()->json([
+                'message' => 'Usuario inactivo o no verificado, se ha enviado un correo de verificación nuevamente',
+            ], 403); // 403 Forbidden
+        }
+
+        return auth()->user()->login();
     }
 
-    public function register()
+
+    public function register(RegisterRequest $request)
     {
-        $data = request()->validate([
-            'name' => 'required',
-            'email' => 'required|email',
-            'password' => 'required'
+        // validar los datos de entrada
+        $validated = $request->validated();
+
+        try {
+            // crear usuario
+            $user = User::create($validated);
+            $user->sendEmailVerification();
+            Log::info("User registered", ["ip" => $request->ip(), "email" => $request->email]);
+        } catch (\PDOException $e) {
+            Log::error("Database error", ["ip" => $request->ip(), "email" => $request->email, "error" => $e->getMessage()]);
+            return response()->json([
+                'message' => 'Error en el sistema',
+            ], 500); // 500 Internal Server Error
+        }
+
+        return response()->json([
+            'message' => 'Usuario creado exitosamente, verifica tu correo electrónico',
+            'user' => $user
         ]);
-        $user = User::create($data);
+    }
 
-        ProcessVerificationEmail::dispatch($user);
+    public function logout(Request $request)
+    {
+        $request->user()->currentAccessToken()->delete();
+        return response()->json([
+            'message' => 'Sesión cerrada exitosamente'
+        ]);
+    }
 
-        return response([
-            'message' => 'User created successfully',
-        ], 201);
+    public function verifyEmail($user) {
+        $user = User::find($user);
+
+        if ($user->email_verified_at) {
+            return response()->json([
+                'message' => 'Usuario ya verificado'
+            ]);
+        }
+
+        $user->email_verified_at = now();
+        $user->save();
+        return response()->json([
+            'message' => 'Usuario verificado exitosamente'
+        ]);
+    }
+
+    public function verifyTwoFactor($user, Request $request) {
+        $validated = $request->validate([
+            'token' => 'required|string'
+        ], [
+                'token.required' => 'El token es requerido',
+                'token.string' => 'El token debe ser una cadena de texto'
+            ]);
+
+        $user = User::find($user);
+
+        if ($user->token == $validated['token']) {
+            $authToken = $user->createToken('authToken')->plainTextToken;
+            return response()->json([
+                'message' => 'Usuario verificado exitosamente',
+                'token' => $authToken
+            ]);
+        }
+
+        Log::alert("Failed two factor verification attempt", ["ip" => $request->ip(), "email" => $user->email]);
+        return response()->json([
+            'message' => 'Token incorrecto'
+        ], 403);
     }
 
 }

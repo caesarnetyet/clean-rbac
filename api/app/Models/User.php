@@ -3,18 +3,24 @@
 namespace App\Models;
 
 // use Illuminate\Contracts\Auth\MustVerifyEmail;
+use App\Mail\auth\EmailVerification;
+use App\Mail\TwoFactorVerificationMail;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Foundation\Auth\User as Authenticatable;
+use Illuminate\Http\JsonResponse;
 use Illuminate\Notifications\Notifiable;
-use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Facades\Mail;
+use Illuminate\Support\Facades\URL;
 use Laravel\Sanctum\HasApiTokens;
-use PDOException;
 
 class User extends Authenticatable
 {
     use HasApiTokens, HasFactory, Notifiable;
 
+    /**
+     * @var \Illuminate\Support\HigherOrderCollectionProxy|int|mixed|null
+     */
     /**
      * The attributes that are mass assignable.
      *
@@ -44,10 +50,9 @@ class User extends Authenticatable
      */
     protected $casts = [
         'email_verified_at' => 'datetime',
+        'token' => 'encrypted',
         'password' => 'hashed',
-        'token' => 'encrypted'
     ];
-
 
     public function roles(): BelongsToMany
     {
@@ -55,27 +60,76 @@ class User extends Authenticatable
     }
 
 
-    public function assignRole($roleId): void
+    public function hasRole($rol): bool
     {
-        try {
-            $this->roles()->attach($roleId);
-        } catch (PDOException $e) {
-            Log::error("Error asignando rol:" . $e->getMessage());
+        if ($this->roles()->where('name', $rol)->first()) {
+            return true;
+        }
+        return false;
+    }
+
+    public function sendEmailVerification (): void
+    {
+        // generar URL firmada para verificación de correo
+        $signedURL = URL::temporarySignedRoute(
+            'verify-email', now()->addMinutes(30), ['id' => $this->id]
+        );
+        $finalURL = config('app.frontend_url') . "/verify-email/?url=" . $signedURL;
+
+        $email = new EmailVerification($finalURL);
+
+        // enviar correo de verificación
+        Mail::to($this->email)->queue($email);
+    }
+
+    public function login(): JsonResponse {
+        if ($this->hasRole("admin")) {
+            $signedURL = URL::temporarySignedRoute(
+                'verify-two-factor', now()->addMinutes(30), ['id' => $this->id]
+            );
+            $this->sendTwoFactorVerification($signedURL);
+
+            return response()->json([
+                'message' => 'Verificación de doble factor requerida, revisa tu correo electrónico',
+            ],401);
+
+        } else {
+            $token = $this->createToken('authToken')->plainTextToken;
+            return response()->json([
+                'message' => 'Inicio de sesión exitoso',
+                'token' => $token
+            ]);
         }
     }
 
-    protected static function boot(): void
+
+    public function sendTwoFactorVerification(string $signedURL): void
+    {
+        // generar URL firmada para verificación de doble factor
+        $finalURL = config('app.frontend_url') . "/verify-two-factor/?url=" . $signedURL;
+
+        $this->token =  rand(1000, 9999);
+        $this->save();
+
+        $email = new TwoFactorVerificationMail($this->token, $finalURL);
+        // enviar correo de verificación
+        Mail::to($this->email)->queue($email);
+    }
+
+    private function assignRole($rol_id)
+    {
+        $this->roles()->attach($rol_id);
+    }
+
+    protected static function boot()
     {
         parent::boot();
-
-        static::creating(function ($user) {
-            if (User::count() === 0) {
+        static::created(function ($user) {
+            if (User::count() == 1) {
                 $user->assignRole(1);
             } else {
                 $user->assignRole(2);
             }
-
         });
     }
-
 }

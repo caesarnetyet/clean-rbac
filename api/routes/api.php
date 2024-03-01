@@ -2,6 +2,7 @@
 
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
+use App\Http\Controllers\AuthController;
 
 /*
 |--------------------------------------------------------------------------
@@ -15,5 +16,18 @@ use Illuminate\Support\Facades\Route;
 */
 
 Route::middleware('auth:sanctum')->get('/user', function (Request $request) {
-    return $request->user();
+    return $request->user()->load('roles');
 });
+
+Route::post('/login', [AuthController::class, 'login']);
+Route::post('/register', [AuthController::class, 'register']);
+
+Route::patch('/verify-email/{id}', [AuthController::class, 'verifyEmail'])
+    ->name('verify-email')
+    ->middleware(['signed'])
+    ->where('id', '[0-9]+');
+
+Route::patch('/verify-two-factor/{id}', [AuthController::class, 'verifyTwoFactor'])
+    ->name('verify-two-factor')
+    ->middleware(['signed'])
+    ->where('id', '[0-9]+');

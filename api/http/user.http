@@ -1,0 +1,4 @@
+GET localhost:8000/api/user
+Accept: application/json
+Authorization: Bearer 1|ZgT4er5yopMnmPxLQak7Rf8fgOq503HPjS2Mu5f9ceddd247
+
