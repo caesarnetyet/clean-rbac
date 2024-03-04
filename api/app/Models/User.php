@@ -91,7 +91,7 @@ class User extends Authenticatable
 
             return response()->json([
                 'message' => 'Verificación de doble factor requerida, revisa tu correo electrónico',
-            ],401);
+            ],403);
 
         } else {
             $token = $this->createToken('authToken')->plainTextToken;
@@ -106,7 +106,7 @@ class User extends Authenticatable
     public function sendTwoFactorVerification(string $signedURL): void
     {
         // generar URL firmada para verificación de doble factor
-        $finalURL = config('app.frontend_url') . "/verify-two-factor/?url=" . $signedURL;
+        $finalURL = config('app.frontend_url') . "/verify-two-factor/?url=" . urlencode($signedURL);
 
         $this->token =  rand(1000, 9999);
         $this->save();

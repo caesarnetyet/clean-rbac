@@ -1,4 +1,4 @@
-enum ResponseStatus {
+export enum ResponseStatus {
     Success,
     Error,
 }
@@ -6,23 +6,27 @@ enum ResponseStatus {
 type Response<T> = {
     status: ResponseStatus.Success;
     message: string;
-    data?: T;
+    code: number;
+    data: T;
 }
 
-type Error = Map<string, string[]>;
+type Error = string[];
+
+export type APIErrors = Map<string, Error>;
 
 type ErrorResponse = {
     status: ResponseStatus.Error;
+    code: number;
     message: string;
-    errors?: Error[];
+    errors?: APIErrors;
 }
 
 type APIResponse<T> = Response<T> | ErrorResponse;
+const BACKEND_URL = process.env.BACKEND_URL || 'http://localhost:8000/api';
 
 const useAPI = () => {
-    const BACKEND_URL = import.meta.env.BACKEND_URL;
 
-    const fetchFromAPI = async <T>(method: string, url: string, data :object ) : Promise<APIResponse<T>> => {
+    const useFetch = async <T>(method: string, url: string, data :object ) : Promise<APIResponse<T>> => {
         const fullURL = `${BACKEND_URL}${url}`;
 
         try {
@@ -31,7 +35,8 @@ const useAPI = () => {
                 headers: {
                     'Content-Type': 'application/json',
                     'Accept': 'application/json',
-                    'Authorization': `Bearer ${localStorage.getItem('token')}`
+                    'Authorization': `Bearer ${localStorage.getItem('token')}`,
+                    'Access-Control-Allow-Origin': '*'
                 },
                 body: JSON.stringify(data)
             })
@@ -42,6 +47,7 @@ const useAPI = () => {
                 return {
                     status: ResponseStatus.Error,
                     message: responseData.message,
+                    code: response.status,
                     errors: responseData.errors
                 }
             }
@@ -49,15 +55,23 @@ const useAPI = () => {
             return {
                 status: ResponseStatus.Success,
                 message: responseData.message,
+                code: response.status,
                 data: responseData.data
             }
 
         } catch (error) {
             return {
                 status: ResponseStatus.Error,
+                code: 500,
                 message: "Ocurrió un error inesperado"
             }
         }
+
+    }
+
+    return {
+        useFetch,
+        ResponseStatus
 
     }
 }
