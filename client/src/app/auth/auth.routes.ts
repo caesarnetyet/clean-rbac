@@ -8,5 +8,9 @@ export const authRoutes: Routes = [
   {
     path: 'register',
     loadComponent: () => import('./register/register.component').then(c => c.RegisterComponent)
+  },
+  {
+    path: 'two-factor',
+    loadComponent: () => import('./two-factor/two-factor.component').then(c => c.TwoFactorComponent)
   }
 ]

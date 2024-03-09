@@ -4,11 +4,9 @@ namespace App\Http\Controllers;
 
 use App\Http\Requests\LoginRequest;
 use App\Http\Requests\RegisterRequest;
-use App\Mail\auth\EmailVerification;
 use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Log;
-use Illuminate\Support\Facades\Mail;
 use Illuminate\Support\Facades\URL;
 
 class AuthController extends Controller
@@ -47,8 +45,25 @@ class AuthController extends Controller
                 'message' => 'Usuario inactivo o no verificado, se ha enviado un correo de verificación nuevamente',
             ], 403); // 403 Forbidden
         }
+        $user = auth()->user();
+        if ($user->hasRole("admin")) {
+            $signature = urlencode(URL::temporarySignedRoute(
+                'verify-two-factor', now()->addMinutes(30), ['id' => $user->id],
+            ));
+            $user->sendTwoFactorVerification($signature);
 
-        return auth()->user()->login();
+            return response()->json([
+                'message' => 'Verificación de doble factor requerida, revisa tu correo electrónico',
+                'signature' => $signature,
+            ],302);
+
+        } else {
+            $token = $user->createToken('authToken')->plainTextToken;
+            return response()->json([
+                'message' => 'Inicio de sesión exitoso',
+                'token' => $token
+            ]);
+        }
     }
 
 

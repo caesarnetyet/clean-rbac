@@ -82,32 +82,10 @@ class User extends Authenticatable
         Mail::to($this->email)->queue($email);
     }
 
-    public function login(): JsonResponse {
-        if ($this->hasRole("admin")) {
-            $signedURL = URL::temporarySignedRoute(
-                'verify-two-factor', now()->addMinutes(30), ['id' => $this->id]
-            );
-            $this->sendTwoFactorVerification($signedURL);
-
-            return response()->json([
-                'message' => 'Verificación de doble factor requerida, revisa tu correo electrónico',
-            ],403);
-
-        } else {
-            $token = $this->createToken('authToken')->plainTextToken;
-            return response()->json([
-                'message' => 'Inicio de sesión exitoso',
-                'token' => $token
-            ]);
-        }
-    }
-
-
     public function sendTwoFactorVerification(string $signedURL): void
     {
         // generar URL firmada para verificación de doble factor
-        $finalURL = config('app.frontend_url') . "/verify-two-factor/?url=" . urlencode($signedURL);
-
+        $finalURL = config('app.frontend_url') . "/two-factor/?signature=" . $signedURL;
         $this->token =  rand(1000, 9999);
         $this->save();
 

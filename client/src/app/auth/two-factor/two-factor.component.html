@@ -1,0 +1,7 @@
+<p>two-factor works!</p>
+{{ signedURL }}
+
+<form (ngSubmit)="handleSubmit()">
+    <input type="text" [(ngModel)]="code" name="code" placeholder="code">
+    <button type="submit" [disabled]="!code.length">Submit</button>
+</form>
