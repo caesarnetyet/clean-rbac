@@ -17,8 +17,8 @@ export const routes: Routes = [
     loadChildren: () => import('./dashboard/dashboard.routes').then(m => m.dashboardRoutes)
   },
   {
-    component: AppComponent,
-    path: '',
+    path: '**',
+    redirectTo: '/auth/login',
   }
 
 ];

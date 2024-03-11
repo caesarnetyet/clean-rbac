@@ -28,9 +28,11 @@ export class AuthService {
         }),
 
        catchError(() => {
-            this.toast.error("Sesión expirada, por favor inicie sesión nuevamente.")
-            from(this.router.navigate(['/auth/login']))
-
+            this.router.navigate(['/auth/login']).then(r =>
+                this.toast.error("No se pudo obtener la información del usuario")
+            ).catch(() => {
+                this.toast.error("No se pudo obtener la información del usuario")
+            })
             return of(false)
        })
     )
