@@ -1,1 +1,20 @@
-<p>dashboard works!</p>
+<mat-toolbar color="primary">
+    <button mat-icon-button (click)="sidenav.toggle()">
+        <mat-icon>menu</mat-icon>
+    </button>
+    <span>Mi Dashboard</span>
+    <span class="ml-auto"></span>
+    <button mat-button (click)="onLogout()">Cerrar sesíón</button>
+
+</mat-toolbar>
+
+<mat-sidenav-container>
+    <mat-sidenav #sidenav mode="side">
+        <p>Sidenav content</p>
+    </mat-sidenav>
+    <mat-sidenav-content>
+        <div class="content-wrapper">
+            <router-outlet></router-outlet>
+        </div>
+    </mat-sidenav-content>
+</mat-sidenav-container>

@@ -1,7 +1,11 @@
-<p>two-factor works!</p>
-{{ signedURL }}
+<div class="form-container">
+    <h1>Autenticación de dos factores</h1>
 
-<form (ngSubmit)="handleSubmit()">
-    <input type="text" [(ngModel)]="code" name="code" placeholder="code">
-    <button type="submit" [disabled]="!code.length">Submit</button>
-</form>
+    <form (ngSubmit)="handleSubmit()">
+        <mat-form-field>
+            <mat-label>Código</mat-label>
+            <input matInput type="text" [(ngModel)]="code" name="code" placeholder="Ingresa el código">
+        </mat-form-field>
+        <button style="display: block" mat-raised-button color="primary" type="submit" [disabled]="!code.length">Ingresar</button>
+    </form>
+</div>

@@ -10,6 +10,10 @@ export const authRoutes: Routes = [
     loadComponent: () => import('./register/register.component').then(c => c.RegisterComponent)
   },
   {
+    path: 'verify-email',
+    loadComponent: () => import('./verify-email/verify-email.component').then(c => c.VerifyEmailComponent)
+  },
+  {
     path: 'two-factor',
     loadComponent: () => import('./two-factor/two-factor.component').then(c => c.TwoFactorComponent)
   }

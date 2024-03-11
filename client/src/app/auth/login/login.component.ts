@@ -1,17 +1,33 @@
-import { Component } from '@angular/core';
-import { FormControl, FormGroup, FormsModule, ReactiveFormsModule, Validators} from "@angular/forms";
-import { LoginService } from "./login.service";
-import { LoginRequest } from "./login.contracts";
+import {Component} from '@angular/core';
+import {FormControl, FormGroup, FormsModule, ReactiveFormsModule, Validators} from "@angular/forms";
+import {MatButtonModule} from "@angular/material/button";
+import {MatFormField, MatFormFieldModule} from "@angular/material/form-field";
+import {MatInputModule} from "@angular/material/input";
+import {RouterModule} from "@angular/router";
+import {RecaptchaModule} from "ng-recaptcha";
+import {environment} from "../../../environments/environment";
+import {LoginRequest} from "./login.contracts";
+import {LoginService} from "./login.service";
 
 @Component({
   selector: 'app-login',
   standalone: true,
-  imports: [ReactiveFormsModule, FormsModule],
+  imports: [
+      ReactiveFormsModule,
+      FormsModule,
+      RecaptchaModule,
+      RouterModule,
+      MatFormFieldModule,
+      MatInputModule,
+      MatButtonModule
+      ],
   templateUrl: './login.component.html',
   styleUrl: './login.component.css'
 })
-  export class LoginComponent {
-    loginForm = new FormGroup({
+export class LoginComponent {
+  recaptchaVerified = false;
+  siteKey = environment.siteKey;
+  loginForm = new FormGroup({
     email: new FormControl('', [Validators.required, Validators.email]),
     password: new FormControl('', [Validators.required, Validators.minLength(6)])
   })
@@ -22,5 +38,9 @@ import { LoginRequest } from "./login.contracts";
    if (!this.loginForm.valid) return
       const formData = this.loginForm.value as LoginRequest
       this.service.login(formData).subscribe();
+  }
+
+  resolved($event: string | null) {
+    this.recaptchaVerified = true
   }
 }

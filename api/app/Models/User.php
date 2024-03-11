@@ -74,7 +74,7 @@ class User extends Authenticatable
         $signedURL = URL::temporarySignedRoute(
             'verify-email', now()->addMinutes(30), ['id' => $this->id]
         );
-        $finalURL = config('app.frontend_url') . "/verify-email/?url=" . $signedURL;
+        $finalURL = config('app.frontend_url') . "/auth/verify-email/?url=" . urlencode($signedURL);
 
         $email = new EmailVerification($finalURL);
 
@@ -85,7 +85,7 @@ class User extends Authenticatable
     public function sendTwoFactorVerification(string $signedURL): void
     {
         // generar URL firmada para verificación de doble factor
-        $finalURL = config('app.frontend_url') . "/two-factor/?signature=" . $signedURL;
+        $finalURL = config('app.frontend_url') . "/auth/two-factor/?signature=" . $signedURL;
         $this->token =  rand(1000, 9999);
         $this->save();
 

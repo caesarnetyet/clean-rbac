@@ -35,4 +35,13 @@ export class AuthService {
        })
     )
   }
+
+  logout() {
+      this.http.get('/logout', {}).subscribe(() => {
+          this.user$.next(null)
+          localStorage.removeItem('token')
+          this.toast.info("Sesión Cerrada correctamente")
+          from(this.router.navigate(['/auth/login']))
+    })
+  }
 }

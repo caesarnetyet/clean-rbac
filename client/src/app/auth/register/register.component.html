@@ -1,1 +1,34 @@
-<p>register works!</p>
+<form class="form-container" [formGroup]="registerForm" (ngSubmit)="handleSubmit()">
+    <h1>Registrarse</h1>
+    <mat-form-field>
+        <mat-label >Nombre</mat-label>
+        <input matInput id="name" type="text" formControlName="name" />
+        @if (controlHasErrors('name')) {
+            <mat-error>{{ getControlErrorMessage('name') }}</mat-error>
+        }
+    </mat-form-field>
+    <mat-form-field>
+        <mat-label>Correo Electrónico</mat-label>
+        <input matInput id="email" type="text" formControlName="email" />
+        @if (controlHasErrors('email')) {
+            <mat-error>{{ getControlErrorMessage('email') }}</mat-error>
+        }
+    </mat-form-field>
+    <mat-form-field>
+        <mat-label>Contraseña</mat-label>
+        <input matInput id="password" type="password" formControlName="password" />
+        @if (controlHasErrors('password')) {
+            <mat-error >{{ getControlErrorMessage('password') }}</mat-error>
+        }
+    </mat-form-field>
+    <mat-form-field>
+        <mat-label>Confirmar contraseña</mat-label>
+        <input matInput id="confirmPassword" type="password" formControlName="password_confirmation" />
+        @if (controlHasErrors('password_confirmation')) {
+            <mat-error>{{ getControlErrorMessage('password_confirmation') }}</mat-error>
+        }
+    </mat-form-field>
+        <re-captcha [siteKey]="siteKey" (resolved)="onRecaptchaResolved()"></re-captcha>
+        <button mat-raised-button type="submit" color="primary"  [disabled]="!registerForm.valid || !recaptchaVerified">Registrarse</button>
+        <a style="text-align: center" [routerLink]="['../login']">Regresar a inicio de sesión</a>
+</form>
