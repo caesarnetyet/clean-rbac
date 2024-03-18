@@ -28,7 +28,7 @@
             <mat-error>{{ getControlErrorMessage('password_confirmation') }}</mat-error>
         }
     </mat-form-field>
-        <re-captcha [siteKey]="siteKey" (resolved)="onRecaptchaResolved()"></re-captcha>
+    <app-recaptcha (resolved)="recaptchaVerified = $event" />
         <button mat-raised-button type="submit" color="primary"  [disabled]="!registerForm.valid || !recaptchaVerified">Registrarse</button>
         <a style="text-align: center" [routerLink]="['../login']">Regresar a inicio de sesión</a>
 </form>

@@ -7,6 +7,7 @@ import {MatInputModule} from "@angular/material/input";
 import {RouterLink} from "@angular/router";
 import {RecaptchaModule} from "ng-recaptcha";
 import {environment} from "../../../environments/environment";
+import {RecaptchaComponent} from "../../components/recaptcha/recaptcha.component";
 import {equalTo} from "./common/validators/equal-to";
 import {RegisterRequest, RegisterValidationErrors} from "./register.contracts";
 import {RegisterService} from "./register.service";
@@ -14,15 +15,16 @@ import {RegisterService} from "./register.service";
 @Component({
   selector: 'app-register',
   standalone: true,
-  imports: [
-    ReactiveFormsModule,
-    RouterLink,
-    NgIf,
-    RecaptchaModule,
-    MatFormFieldModule,
-    MatInputModule,
-    MatButton
-  ],
+    imports: [
+        ReactiveFormsModule,
+        RouterLink,
+        NgIf,
+        RecaptchaModule,
+        MatFormFieldModule,
+        MatInputModule,
+        MatButton,
+        RecaptchaComponent
+    ],
   templateUrl: './register.component.html',
   styleUrl: './register.component.css'
 })

@@ -11,7 +11,7 @@
     padding: 30px;
     border-radius: 5px;
     box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1); /* Subtle shadow */
-    max-width: 400px; /* Limit form width for readability */
+    min-width: 303px;
     display: flex;
     flex-direction: column;
 
