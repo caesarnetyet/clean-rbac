@@ -29,8 +29,7 @@ import {RegisterService} from "./register.service";
   styleUrl: './register.component.css'
 })
 export class RegisterComponent {
-  recaptchaVerified = false;
-  siteKey = environment.siteKey;
+  recaptchaVerified: string | null = null;
 
   registerForm = this.formBuilder.group({
     name: ['', [Validators.required, Validators.minLength(3)]],
@@ -74,7 +73,9 @@ export class RegisterComponent {
 
   handleSubmit() {
     if (this.registerForm.invalid || !this.recaptchaVerified) return;
-    this.service.register(this.registerForm.value as RegisterRequest)
+    const formData = this.registerForm.value as RegisterRequest;
+    formData['g-recaptcha-response'] = this.recaptchaVerified;
+    this.service.register(formData)
         .subscribe( response => {
           if (response.errors) {
             this.handleServerValidationErrors(response.errors)
@@ -92,7 +93,5 @@ export class RegisterComponent {
     }
   }
 
-  onRecaptchaResolved() {
-    this.recaptchaVerified = true;
-  }
+
 }

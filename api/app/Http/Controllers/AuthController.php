@@ -16,12 +16,11 @@ class AuthController extends Controller
     {
         Log::info("Login attempt", ["ip" => $request->ip()]);
 
-        // validar los datos de entrada
-        $validated = $request->validated();
+        $credentials = $request->only('email', 'password');
 
         try {
             // intentar iniciar sesión
-            if (!auth()->attempt($validated)) {
+            if (!auth()->attempt($credentials)) {
                 Log::alert("Failed login attempt", ["ip" => $request->ip(), "email" => $request->email]);
                 return response()->json([
                     'message' => 'Credenciales incorrectas',

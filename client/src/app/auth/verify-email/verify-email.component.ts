@@ -31,7 +31,7 @@ export class VerifyEmailComponent {
 
   getUrlParam() {
     const url  =this.route.snapshot.queryParamMap.get('url');
-    if (url === null) {
+   if (url === null) {
       this.router.navigate(['auth/login']).then(
           () => this.toast.error("Por favor, inicie sesión y solicite un nuevo email de verificación")
       );

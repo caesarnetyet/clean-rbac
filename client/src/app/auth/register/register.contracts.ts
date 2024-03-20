@@ -3,6 +3,7 @@ export interface RegisterRequest {
     email: string;
     password: string;
     password_confirmation: string;
+    'g-recaptcha-response': string | null;
 }
 
 export type RegisterValidationErrors = {[field: string]: string}

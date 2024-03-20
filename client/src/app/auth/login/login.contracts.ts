@@ -1,6 +1,7 @@
 export interface LoginRequest {
   email: string;
   password: string;
+  'g-recaptcha-response': string | null;
 }
 
 export interface LoginResponse{

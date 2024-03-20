@@ -15,9 +15,9 @@ import {environment} from "../../../environments/environment";
 })
 export class RecaptchaComponent {
   siteKey = environment.siteKey
-  @Output() resolved = new EventEmitter<boolean>
+  @Output() resolved = new EventEmitter<string| null>
 
-    handleResolved() {
-        this.resolved.emit(true)
+    handleResolved(token: string | null) {
+      this.resolved.emit(token)
     }
 }

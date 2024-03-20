@@ -26,7 +26,7 @@ import {LoginService} from "./login.service";
   styleUrl: './login.component.css'
 })
 export class LoginComponent {
-  recaptchaVerified = false;
+  recaptchaVerified: string | null = null
   loginForm = new FormGroup({
     email: new FormControl('', [Validators.required, Validators.email]),
     password: new FormControl('', [Validators.required, Validators.minLength(6)])
@@ -37,6 +37,8 @@ export class LoginComponent {
   handleSubmit() {
    if (!this.loginForm.valid) return
       const formData = this.loginForm.value as LoginRequest
+      formData["g-recaptcha-response"] = this.recaptchaVerified
+      console.log(formData)
       this.service.login(formData).subscribe();
   }
 
