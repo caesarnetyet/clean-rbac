@@ -1,0 +1,43 @@
+.example-form {
+    min-width: 150px;
+    max-width: 500px;
+    width: 100%;
+  }
+  
+  .example-full-width {
+    width: 100%;
+  }
+  
+  td {
+    padding-right: 8px;
+  }
+  .example-button-row {
+    display: table-cell;
+    max-width: 600px;
+  }
+  
+  .example-button-row .mat-mdc-button-base {
+    margin: 8px 8px 8px 0;
+  }
+  .mdc-fab{
+    width: 42px;
+    height: 42px;
+    margin-right: 10px;
+  }
+
+  button.mdc-button.mdc-button--unelevated.mat-mdc-unelevated-button.mat-primary.mat-mdc-button-base {
+    margin-bottom: 25px;
+}
+table.mat-mdc-table.mdc-data-table__table.cdk-table{
+    min-width: 55%;
+}
+.mat-mdc-dialog-container .mdc-dialog__surface {
+    border-radius: var(--mdc-dialog-container-shape, 24px);
+    padding: 30px;
+}
+div#cdk-overlay-3 {
+    min-width: 60%;
+}
+.cdk-overlay-pane {
+    min-width: 60% !important;
+}

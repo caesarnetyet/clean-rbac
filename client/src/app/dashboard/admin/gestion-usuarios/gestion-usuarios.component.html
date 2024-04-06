@@ -1,0 +1,38 @@
+<div>
+    <h2>Administrar Usuarios</h2>
+    <!-- Botón para crear un nuevo usuario -->
+    <button mat-flat-button pad color="primary" (click)="abrirFormulario('nuevo')">Nuevo Usuario</button>
+    
+    <!-- Tabla para mostrar la lista de usuarios -->
+    <table mat-table table-users [dataSource]="dataSource" class="mat-elevation-z8">
+      <!-- Columnas de la tabla -->
+      <ng-container matColumnDef="id">
+        <th mat-header-cell *matHeaderCellDef>ID</th>
+        <td mat-cell *matCellDef="let user">{{ user.id }}</td>
+      </ng-container>
+      <ng-container matColumnDef="name">
+        <th mat-header-cell *matHeaderCellDef>Nombre</th>
+        <td mat-cell *matCellDef="let user">{{ user.name }}</td>
+      </ng-container>
+      <ng-container matColumnDef="email">
+        <th mat-header-cell *matHeaderCellDef>Email</th>
+        <td mat-cell *matCellDef="let user">{{ user.email }}</td>
+      </ng-container>
+      <ng-container matColumnDef="actions">
+        <th mat-header-cell *matHeaderCellDef>Acciones</th>
+        <td mat-cell *matCellDef="let user">
+          <!-- Botones para actualizar y eliminar usuarios -->
+          <button mat-icon-button color="" aria-label="Editar usuario" (click)="abrirFormulario('editar', user)">
+            <mat-icon>edit</mat-icon>
+          </button>
+          <button mat-icon-button color="warn" aria-label="Eliminar usuario" (click)="abrirFormulario('eliminar', user)">
+            <mat-icon>delete</mat-icon>
+          </button>
+        </td>
+      </ng-container>
+  
+      <!-- Filas de la tabla -->
+      <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
+      <tr mat-row *matRowDef="let row; columns: displayedColumns;"></tr>
+    </table>
+</div>

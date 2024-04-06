@@ -1,0 +1,20 @@
+<div class="container-modal">
+    <h2>Agregar Usuario</h2>
+    <form>
+        <mat-form-field>
+            <input matInput placeholder="Nombre" [(ngModel)]="newUser.name" name="name">
+        </mat-form-field>
+        <mat-form-field>
+            <input 
+            matInput 
+            type="email" 
+            [(ngModel)]="newUser.email"
+            placeholder="Correo electrónico"
+            name="email"
+            >
+        </mat-form-field>
+        <!-- Agregar más campos según sea necesario -->
+        <button mat-raised-button pad color="accent" (click)="guardarNuevoUsuario()">Guardar</button>
+        <button mat-raised-button color="warn" (click)="cancelar()">Cancelar</button>
+    </form>
+</div>

@@ -1,0 +1,10 @@
+.mat-mdc-dialog-container .mdc-dialog__surface {
+    border-radius: var(--mdc-dialog-container-shape, 24px);
+    padding: 30px;
+}
+.container-modal{
+    margin: 30px;
+}
+button{
+    margin-right: 12px;
+}
