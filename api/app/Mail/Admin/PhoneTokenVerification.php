@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Mail;
+namespace App\Mail\Admin;
 
 use Illuminate\Bus\Queueable;
 use Illuminate\Contracts\Queue\ShouldQueue;
@@ -9,19 +9,16 @@ use Illuminate\Mail\Mailables\Content;
 use Illuminate\Mail\Mailables\Envelope;
 use Illuminate\Queue\SerializesModels;
 
-class TwoFactorVerificationMail extends Mailable
+class PhoneTokenVerification extends Mailable
 {
     use Queueable, SerializesModels;
-
-    private string $token, $url;
 
     /**
      * Create a new message instance.
      */
-    public function __construct(string $token)
-    {
-        $this->token = $token;
-    }
+    public function __construct(
+        private readonly string $token
+    ){}
 
     /**
      * Get the message envelope.
@@ -29,7 +26,7 @@ class TwoFactorVerificationMail extends Mailable
     public function envelope(): Envelope
     {
         return new Envelope(
-            subject: 'Two Factor Verification Mail',
+            subject: 'Phone Token Verification',
         );
     }
 
@@ -39,10 +36,8 @@ class TwoFactorVerificationMail extends Mailable
     public function content(): Content
     {
         return new Content(
-            view: 'auth.two-factor',
-            with: [
-                'token' => $this->token,
-            ],
+            view: 'admin.phone-token-verification',
+            with: ['token' => $this->token],
         );
     }
 

@@ -17,9 +17,11 @@ class EmailVerification extends Mailable
     /**
      * Create a new message instance.
      */
-    public function __construct(string $url)
+    public function __construct(string $signedURL)
     {
-        $this->url = $url;
+
+        $finalURL = config('app.frontend_url') . "/auth/verify-email/?url=" . urlencode($signedURL);
+        $this->url = $finalURL;
     }
 
     /**
@@ -28,7 +30,7 @@ class EmailVerification extends Mailable
     public function envelope(): Envelope
     {
         return new Envelope(
-            subject: 'Verifica tu correo electronico',
+            subject: 'Verifica tu correo electrónico',
         );
     }
 

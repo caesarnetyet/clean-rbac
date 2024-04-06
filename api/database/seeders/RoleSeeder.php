@@ -21,7 +21,11 @@ class RoleSeeder extends Seeder
             ],
             [
                 'id'    => 2,
-                'name'  => 'user'
+                'name'  => 'coordinator'
+            ],
+            [
+                'id'    => 3,
+                'name'  => 'guest'
             ]
         ]);
     }
