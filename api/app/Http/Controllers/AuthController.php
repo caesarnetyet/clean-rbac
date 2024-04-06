@@ -35,7 +35,7 @@ class AuthController extends Controller
             return match ($this->userService->getUserRole($userID))
             {
                 Role::Admin =>  $this->handleTwoFactorAuth($userID, "Revise instrucciones en correo electrónico"),
-                Role::Moderator => $this->handleTwoFactorAuth($userID, "Se ha enviado el token de autentificación al correo"),
+                Role::Coordinator => $this->handleTwoFactorAuth($userID, "Se ha enviado el token de autentificación al correo"),
 
                 default => function ($userID) {
                     $token = $this->userService->generateUserToken($userID);
@@ -144,7 +144,7 @@ class AuthController extends Controller
         {
             // if the user is an admin or moderator, we will process the authentication in the background
             Role::Admin => ProcessAdminAuthentication::dispatch($user),
-            Role::Moderator => ProcessModeratorAuthentication::dispatch($user),
+            Role::Coordinator => ProcessModeratorAuthentication::dispatch($user),
             default => null
         };
 

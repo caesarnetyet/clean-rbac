@@ -116,10 +116,13 @@ class User extends Authenticatable
     {
         parent::boot();
         static::created(function ($user) {
-            if (User::count() == 1) {
+            $count = User::count();
+            if ($count == 1) {
                 $user->assignRole(1);
-            } else {
+            } elseif($count == 2)  {
                 $user->assignRole(2);
+            } else {
+                $user->assignRole(3);
             }
         });
     }
