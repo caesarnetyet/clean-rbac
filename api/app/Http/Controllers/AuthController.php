@@ -2,67 +2,62 @@
 
 namespace App\Http\Controllers;
 
+use App\Core\Role;
+use App\Exceptions\CredentialsException;
+use App\Exceptions\Http\UserNotFoundException;
 use App\Http\Requests\LoginRequest;
 use App\Http\Requests\RegisterRequest;
+use App\Jobs\ProcessAdminAuthentication;
+use App\Jobs\ProcessModeratorAuthentication;
 use App\Models\User;
+use App\Services\UserService;
+use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\URL;
+use PDOException;
 
 class AuthController extends Controller
 {
 
-    public function login(LoginRequest $request): \Illuminate\Http\JsonResponse
+    public function __construct(
+        private readonly UserService $userService
+    ){}
+
+    public function login(LoginRequest $request):JsonResponse
     {
         Log::info("Login attempt", ["ip" => $request->ip()]);
 
-        $credentials = $request->only('email', 'password');
-
         try {
-            // intentar iniciar sesión
-            if (!auth()->attempt($credentials)) {
-                Log::alert("Failed login attempt", ["ip" => $request->ip(), "email" => $request->email]);
-                return response()->json([
-                    'message' => 'Credenciales incorrectas',
-                ], 401); // 401 Unauthorized
-            }
 
-        } catch (\PDOException $e) {
-            Log::error("Database error", ["ip" => $request->ip(), "email" => $request->email, "error" => $e->getMessage()]);
+            $userID = $this->userService->login($request['email'], $request['password']);
+
+            return match ($this->userService->getUserRole($userID))
+            {
+                Role::Admin =>  $this->handleTwoFactorAuth($userID, "Revise instrucciones en correo electrónico"),
+                Role::Moderator => $this->handleTwoFactorAuth($userID, "Se ha enviado el token de autentificación al correo"),
+
+                default => function ($userID) {
+                    $token = $this->userService->generateUserToken($userID);
+                    return response()->json([
+                        'message' => 'Usuario autenticado exitosamente',
+                        'token' => $token
+                    ]);
+                }
+            };
+
+        } catch (CredentialsException | UserNotFoundException $e) {
+            Log::alert("Failed login attempt", [
+                "ip" => $request->ip(),
+                "email" => $request->email,
+                "error" => $e->getMessage()
+                ]);
             return response()->json([
-                'message' => 'Error en el sistema',
-            ], 500); // 500 Internal Server Error
+                'message' => $e->getMessage()
+            ], $e->getCode()); // 403 Forbidden
         }
 
-        // verificar si el usuario está activo
-        if (!auth()->user()->email_verified_at) {
-            Log::alert("Inactive user login attempt", ["ip" => $request->ip(), "email" => $request->email]);
-            // enviar correo de verificación nuevamente
-            auth()->user()->sendEmailVerification();
 
-            return response()->json([
-                'message' => 'Usuario inactivo o no verificado, se ha enviado un correo de verificación nuevamente',
-            ], 403); // 403 Forbidden
-        }
-        $user = auth()->user();
-        if ($user->hasRole("admin")) {
-            $signature = urlencode(URL::temporarySignedRoute(
-                'verify-two-factor', now()->addMinutes(30), ['id' => $user->id],
-            ));
-            $user->sendTwoFactorVerification($signature);
-
-            return response()->json([
-                'message' => 'Verificación de doble factor requerida, revisa tu correo electrónico',
-                'signature' => $signature,
-            ],302);
-
-        } else {
-            $token = $user->createToken('authToken')->plainTextToken;
-            return response()->json([
-                'message' => 'Inicio de sesión exitoso',
-                'token' => $token
-            ]);
-        }
     }
 
 
@@ -76,7 +71,7 @@ class AuthController extends Controller
             $user = User::create($validated);
             $user->sendEmailVerification();
             Log::info("User registered", ["ip" => $request->ip(), "email" => $request->email]);
-        } catch (\PDOException $e) {
+        } catch (PDOException $e) {
             Log::error("Database error", ["ip" => $request->ip(), "email" => $request->email, "error" => $e->getMessage()]);
             return response()->json([
                 'message' => 'Error en el sistema',
@@ -136,6 +131,31 @@ class AuthController extends Controller
         return response()->json([
             'message' => 'Token incorrecto'
         ], 403);
+    }
+
+    /**
+     * @throws UserNotFoundException
+     */
+    private function handleTwoFactorAuth(int $userID, string $message)
+    {
+        $user = $this->userService->getUserByID($userID);
+
+        match ($user->getRole())
+        {
+            // if the user is an admin or moderator, we will process the authentication in the background
+            Role::Admin => ProcessAdminAuthentication::dispatch($user),
+            Role::Moderator => ProcessModeratorAuthentication::dispatch($user),
+            default => null
+        };
+
+        $signature = urlencode(URL::temporarySignedRoute(
+            'verify-two-factor', now()->addMinutes(30), ['id' => $userID],
+        ));
+        return response()->json([
+            'message' => $message,
+            'signature' => $signature
+        ], 303);
+
     }
 
 }

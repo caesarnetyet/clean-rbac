@@ -7,11 +7,14 @@ use App\Mail\auth\EmailVerification;
 use App\Mail\TwoFactorVerificationMail;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
+use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
 use Illuminate\Support\Facades\Mail;
 use Illuminate\Support\Facades\URL;
+use App\Core\Role as CoreRole;
 use Laravel\Sanctum\HasApiTokens;
+
 
 class User extends Authenticatable
 {
@@ -39,6 +42,7 @@ class User extends Authenticatable
     protected $hidden = [
         'password',
         'token',
+        'phone_token',
         'remember_token',
     ];
 
@@ -50,12 +54,23 @@ class User extends Authenticatable
     protected $casts = [
         'email_verified_at' => 'datetime',
         'token' => 'encrypted',
+        'phone_token' => 'encrypted',
         'password' => 'hashed',
     ];
 
     public function roles(): BelongsToMany
     {
         return $this->belongsToMany(Role::class);
+    }
+
+    public function tasks(): HasMany
+    {
+        return $this->hasMany(Task::class);
+    }
+
+    public function getRole(): CoreRole
+    {
+        return CoreRole::from($this->roles()->first()->id);
     }
 
 
@@ -73,9 +88,7 @@ class User extends Authenticatable
         $signedURL = URL::temporarySignedRoute(
             'verify-email', now()->addMinutes(30), ['id' => $this->id]
         );
-        $finalURL = config('app.frontend_url') . "/auth/verify-email/?url=" . urlencode($signedURL);
-
-        $email = new EmailVerification($finalURL);
+        $email = new EmailVerification($signedURL);
 
         // enviar correo de verificación
         Mail::to($this->email)->queue($email);
@@ -97,6 +110,7 @@ class User extends Authenticatable
     {
         $this->roles()->attach($rol_id);
     }
+
 
     protected static function boot()
     {
