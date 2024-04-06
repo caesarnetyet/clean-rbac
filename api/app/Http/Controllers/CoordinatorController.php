@@ -137,7 +137,7 @@ class CoordinatorController extends Controller
             'id' => $task->id,
             'title' => $task->title,
             'body' => $task->body,
-            'user' => $task->user->get(['id', 'name', 'email']),
+            'user' => $task->user,
             'doneAt' => $task->done_at,
             'deleteUrl' => $this->generateDeleteTaskURL($task->id),
             'updateUrl' => $this->generateUpdateTaskURL($task->id)
@@ -149,7 +149,7 @@ class CoordinatorController extends Controller
         return URL::temporarySignedRoute(
             'delete-task',
             now()->addMinutes(30),
-            ['id' => $taskID]
+            ['taskID' => $taskID]
         );
     }
 
@@ -158,7 +158,7 @@ class CoordinatorController extends Controller
         return URL::temporarySignedRoute(
             'update-task',
             now()->addMinutes(30),
-            ['id' => $taskID]
+            ['taskID' => $taskID]
         );
     }
 

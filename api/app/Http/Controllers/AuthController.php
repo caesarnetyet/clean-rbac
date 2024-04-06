@@ -36,14 +36,7 @@ class AuthController extends Controller
             {
                 Role::Admin =>  $this->handleTwoFactorAuth($userID, "Revise instrucciones en correo electrónico"),
                 Role::Coordinator => $this->handleTwoFactorAuth($userID, "Se ha enviado el token de autentificación al correo"),
-
-                default => function ($userID) {
-                    $token = $this->userService->generateUserToken($userID);
-                    return response()->json([
-                        'message' => 'Usuario autenticado exitosamente',
-                        'token' => $token
-                    ]);
-                }
+                Role::Guest => $this->handleGuestAuth($userID),
             };
 
         } catch (CredentialsException | UserNotFoundException $e) {
@@ -56,8 +49,17 @@ class AuthController extends Controller
                 'message' => $e->getMessage()
             ], $e->getCode()); // 403 Forbidden
         }
+    }
 
-
+    /**
+     * @throws UserNotFoundException
+     */
+    private function handleGuestAuth(int $userID) {
+        $token = $this->userService->generateUserToken($userID);
+        return response()->json([
+            'message' => 'Usuario autenticado exitosamente',
+            'token' => $token
+        ]);
     }
 
 

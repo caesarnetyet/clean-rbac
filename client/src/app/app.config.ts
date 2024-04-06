@@ -10,8 +10,8 @@ export const appConfig: ApplicationConfig = {
   providers: [
       provideRouter(routes),
       provideHttpClient(
+          withFetch(),
           withInterceptors([rbacApiInterceptor]),
-      withFetch()
       ), provideAnimationsAsync(),
       {provide: ToastService, useClass: MaterialToastService}
   ]

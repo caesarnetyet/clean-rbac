@@ -10,5 +10,5 @@ export interface LoginResponse{
 }
 
 export enum LoginErrorStatus {
-    TwoFactorRequired = 302,
+    TwoFactorRequired = 303,
 }

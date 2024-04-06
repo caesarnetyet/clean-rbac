@@ -5,7 +5,8 @@ interface Role{
 
 export enum UserRole {
     Admin = 1,
-    User = 2
+    Coordinator = 2,
+    User = 3
 }
 
 export interface UserResponse {

@@ -1,0 +1,9 @@
+<p>coordinator works!</p>
+
+@for (task of tasks$ | async; track task) {
+    <p>{{task.id}}</p>
+    <p>{{task.title}}</p>
+    <p>{{task.body}}</p>
+    <button (click)="deleteTask(task.deleteUrl)">Delete</button>
+
+}

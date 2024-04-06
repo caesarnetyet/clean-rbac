@@ -106,7 +106,7 @@ class CoordinatorService
         try {
             $guest = User::findOrFail($guestID);
             if ($guest->roles()->where('role_id', Role::Guest)->count() === 0){
-                throw new RoleException("Rol no permitido");
+                throw new RoleException("Usuario no es guest");
             }
 
         } catch (PDOException $e) {

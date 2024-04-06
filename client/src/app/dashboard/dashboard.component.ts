@@ -33,9 +33,17 @@ export class DashboardComponent {
 
  async ngOnInit() {
     if (!this.user.value) this.authService.fetchUser().subscribe()
-    if (this.user.value?.role === UserRole.Admin) {
-      await this.router.navigate(['dashboard/admin'])
-    }
+
+     switch (this.user.value?.role) {
+         case UserRole.Admin:
+            await this.router.navigate(['dashboard/admin'])
+            break
+         case UserRole.Coordinator:
+            await this.router.navigate(['dashboard/coordinator'])
+            break
+         case UserRole.User:
+             await this.router.navigate(['dashboard/guest'])
+     }
 
   }
 
