@@ -6,13 +6,12 @@ import {rbacApiInterceptor} from "./interceptors/rbac-api.interceptor";
 import { provideAnimationsAsync } from '@angular/platform-browser/animations/async';
 import { ToastService } from './common/services/toast/toast.service';
 import { MaterialToastService } from './common/services/toast/material-toast.service';
+import { provideNoopAnimations } from '@angular/platform-browser/animations';
 export const appConfig: ApplicationConfig = {
   providers: [
-      provideRouter(routes),
-      provideHttpClient(
-          withFetch(),
-          withInterceptors([rbacApiInterceptor]),
-      ), provideAnimationsAsync(),
-      {provide: ToastService, useClass: MaterialToastService}
-  ]
+    provideRouter(routes),
+    provideHttpClient(withFetch(), withInterceptors([rbacApiInterceptor])), provideAnimationsAsync(),
+    { provide: ToastService, useClass: MaterialToastService },
+    provideNoopAnimations()
+]
 };

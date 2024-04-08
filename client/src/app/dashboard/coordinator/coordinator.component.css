@@ -1,0 +1,17 @@
+.containerdash{
+    max-width: 1240px;
+    width: 85%;
+    padding: 40px 0;
+    margin: auto;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    min-height: 50vh;
+}
+.buttonWidth{
+    width: 50%;
+    max-width: 200px;
+}
+.cardTask{
+    margin: 25px 0 0 0;
+}

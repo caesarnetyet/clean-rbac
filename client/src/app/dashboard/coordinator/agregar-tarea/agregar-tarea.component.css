@@ -1,0 +1,10 @@
+.container-section{
+    padding: 50px;
+
+    .widthField{
+        width: 100%;
+    }
+    .pad{
+        margin-right: 15px;
+    }
+}
