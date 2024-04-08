@@ -1,3 +1,16 @@
-.container-section{
-    padding: 50px;
+mat-card {
+    max-width: 450px; /* Adjust width as needed */
+    margin: 20px auto;  /* Center the card */
 }
+
+mat-card-content {
+    padding: 15px;
+}
+
+mat-card-actions {
+    text-align: right; /* Align buttons to the right */
+}
+
+button {
+    margin-left: 10px;  /* Spacing between buttons */
+} 

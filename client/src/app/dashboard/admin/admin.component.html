@@ -1,5 +1,19 @@
 <div class="container-section">
-    <p>admin works!</p>
-    <app-gestion-usuarios></app-gestion-usuarios>
-
+    @for (user of users$ | async; track user) {
+    <mat-card>
+        <mat-card-content>
+            <p>{{user.name}}</p>
+            <p>{{user.email}}</p>
+            <p>{{user.role.name}}</p>
+        </mat-card-content>
+        <mat-card-actions>
+            <button *ngIf="user.disableURL" mat-button (click)="disableUser(user.disableURL)">
+                Habilitar Usuario
+            </button>
+            <button *ngIf="user.enableURL" mat-button (click)="enableUser(user.enableURL)">
+                Deshabilitar Usuario
+            </button>
+        </mat-card-actions>
+    </mat-card>
+    }
 </div>

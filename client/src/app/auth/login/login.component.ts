@@ -38,7 +38,6 @@ export class LoginComponent {
    if (!this.loginForm.valid) return
       const formData = this.loginForm.value as LoginRequest
       formData["g-recaptcha-response"] = this.recaptchaVerified
-      console.log(formData)
       this.service.login(formData).subscribe();
   }
 

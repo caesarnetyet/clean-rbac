@@ -2,24 +2,88 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\User;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\URL;
 
 class UserManagementController extends Controller
 {
     //
 
     //fetch active and inactive users by verified email
-    public function fetchUsers(Request $request)
+    function listUsers()
     {
-        $activeUsers = User::where('email_verified_at', '!=', null)->get();
-        $inactiveUsers = User::where('email_verified_at', '=', null)->get();
+        $users = User::all();
 
-        $users = [
-            'active' => $activeUsers,
-            'inactive' => $inactiveUsers
+        $usersDTO = $users->map(fn($user) => $this->generateUserDTO($user));
+
+        return response()->json([
+            'message' => 'Usuarios obtenidos correctamente',
+            'data' => $usersDTO
+        ]);
+
+    }
+
+    function generateUserDTO(User $user)
+    {
+        return array_merge([
+            'id' => $user->id,
+            'name' => $user->name,
+            'email' => $user->email,
+            'active' => $user->active,
+            'role' => $user->roles()->first()->only(['id', 'name'])
+        ], $this->generateUrls($user));
+    }
+
+    function generateUrls(User $user)
+    {
+        if ($user->hasRole('admin')) {
+            return [
+                'disableURL' => null,
+                'enableURL' => null,
+            ];
+        }
+        return [
+            'disableURL' => $user->active ? $this->generateDisableUserURL($user->id) : null,
+            'enableURL' => !$user->active ? $this->generateEnableUserURL($user->id) : null,
         ];
+    }
 
-        return response()->json(['data' => $users]);
+    function generateDisableUserURL($userID)
+    {
+        return URL::temporarySignedRoute('disable-user',
+            now()->addMinutes(30),
+            ['userID' => $userID]);
+    }
+
+    function generateEnableUserURL($userID)
+    {
+        return URL::temporarySignedRoute('enable-user',
+            now()->addMinutes(30),
+            ['userID' => $userID]);
+    }
+
+
+    function disableUser(int $userID)
+    {
+        $user = User::find($userID);
+        $user->active = false;
+        $user->save();
+
+        return response()->json([
+            'message' => 'Usuario desactivado correctamente'
+        ]);
+    }
+
+    function enableUser(int $userID)
+    {
+        $user = User::find($userID);
+        $user->active = true;
+        $user->save();
+
+        return response()->json([
+            'message' => 'Usuario activado correctamente'
+        ]);
     }
 
 }
