@@ -94,8 +94,8 @@ class CoordinatorService
     public function listGuests(): Collection
     {
         return User::whereHas('roles', fn($query) =>
-        $query->where('id', Role::Guest)
-        )->get('id', 'name', 'email');
+        $query->where('role_id', Role::Guest)
+        )->get();
     }
 
     /**
