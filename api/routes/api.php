@@ -47,7 +47,7 @@ Route::prefix('mobile')->group(function () {
 Route::controller(GuestController::class)->group(function () {
     Route::get('/assigned-tasks', 'listAssignedTasks');
     Route::post('/done/{taskID}', 'markAsDone')->name('done-task')->middleware('signed');
-})->middleware(['auth:sanctum', 'role:guest']);
+})->middleware(['auth:sanctum', 'roles:coordinator']);
 
 Route::controller(CoordinatorController::class)->group(function () {
     Route::get('/tasks', 'listTasks');

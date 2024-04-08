@@ -43,6 +43,17 @@ class TaskControllerUnitTest extends TestCase
 
     }
 
+    public function test_list_assigned_task()
+    {
+        $this->seed();
+
+        $user = $this->getUserWithRole(3);
+
+        $response = $this->actingAs($user)->get('/api/assigned-tasks');
+        $response->assertStatus(200);
+        dump($response->getContent());
+    }
+
     public function getUserWithRole(int $role)
     {
         $user = User::factory()->create();

@@ -11,7 +11,7 @@ class GuestService
 {
     public function listAssignedTasks(User $user): Collection
     {
-        return $user->tasks->only(['id', 'title', 'body', 'done_at']);
+        return $user->tasks()->get();
     }
 
     public function markAsDone($taskID): void
