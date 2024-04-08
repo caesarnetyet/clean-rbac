@@ -16,7 +16,6 @@ class RoleMiddleware
     public function handle(Request $request, Closure $next, ...$role): Response
     {
         $user = $request->user();
-
         if (!in_array($user->role->name, $role)) {
             return response()->json([
                 'message' => 'No tienes permisos para realizar esta acción'

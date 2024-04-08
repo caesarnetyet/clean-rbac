@@ -1,0 +1,3 @@
+GET http://localhost:8000/api/assigned-tasks
+Accept: application/json
+Authorization: Bearer 1|DHXzsRR8XFYB1jlmQNyVARv1y0Cy1UBSYOBtESPK315b891d

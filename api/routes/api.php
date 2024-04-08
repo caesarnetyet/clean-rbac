@@ -44,10 +44,8 @@ Route::prefix('mobile')->group(function () {
     Route::post('/verify-token', [MobileAuthController::class, 'generateToken'])->middleware(['auth:sanctum']);
 });
 
-Route::controller(GuestController::class)->group(function () {
-    Route::get('/assigned-tasks', 'listAssignedTasks');
-    Route::post('/done/{taskID}', 'markAsDone')->name('done-task')->middleware('signed');
-})->middleware(['auth:sanctum', 'roles:coordinator']);
+Route::get('/assigned-tasks', [GuestController::class, 'listAssignedTasks'])->middleware(['auth:sanctum']);
+Route::post('/done/{taskID}', [GuestController::class, 'markAsDone'])->name('done-task')->middleware('signed');
 
 Route::controller(CoordinatorController::class)->group(function () {
     Route::get('/tasks', 'listTasks');
@@ -55,7 +53,7 @@ Route::controller(CoordinatorController::class)->group(function () {
     Route::get('/guests', 'listGuests');
     Route::put('/tasks/{taskID}', 'updateTask')->middleware('signed')->name('update-task');
     Route::delete('/tasks/{taskID}', 'deleteTask')->middleware('signed')->name('delete-task');
-})->middleware(['auth:sanctum', 'roles:coordinator']);
+})->middleware(['auth:sanctum']);
 
 Route::controller(UserManagementController::class)->group(function () {
     Route::get('/users', 'listUsers');

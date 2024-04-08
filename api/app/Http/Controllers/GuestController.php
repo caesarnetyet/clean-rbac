@@ -15,7 +15,14 @@ class GuestController extends Controller
 
     public function listAssignedTasks(Request $request)
     {
+        if(!$request->user()) {
+            return response()->json([
+                'message' => 'No tienes permisos para realizar esta acción'
+            ], 403);
+        }
+
         try {
+
             $tasks = $this->guestService->listAssignedTasks($request->user());
             $tasksDTO = $tasks->map(fn($task) => $this->generateTaskDTO($task));
 
