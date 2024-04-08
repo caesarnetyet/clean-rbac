@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Services\GuestService;
+use Illuminate\Http\Request;
 use Illuminate\Support\Facades\URL;
 use PDOException;
 
@@ -12,10 +13,10 @@ class GuestController extends Controller
         private readonly GuestService $guestService
     ){}
 
-    public function listAssignedTasks()
+    public function listAssignedTasks(Request $request)
     {
         try {
-            $tasks = $this->guestService->listAssignedTasks(auth()->user());
+            $tasks = $this->guestService->listAssignedTasks($request->user());
             $tasksDTO = $tasks->map(fn($task) => $this->generateTaskDTO($task));
 
             return response()->json([
