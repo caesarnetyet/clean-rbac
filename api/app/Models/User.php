@@ -32,9 +32,10 @@ class User extends Authenticatable
         'name',
         'email',
         'password',
+        'active'
     ];
-
-    /**
+    
+     /**
      * The attributes that should be hidden for serialization.
      *
      * @var array<int, string>

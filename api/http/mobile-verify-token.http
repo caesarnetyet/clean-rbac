@@ -1,8 +1,8 @@
 POST http://localhost:8000/api/mobile/verify-token
 Content-Type: application/json
 Accept: application/json
-Authorization: Bearer 17|dmPna0AdLJRlnUag3jibQWhLqx99IE9d4SkRBcFF2a714c2a
+Authorization: Bearer 1|S8dXBuRumNV42jYOORNbCY2b3iOJOEQFvgHCB4s3287e84f8
 
 {
-"phoneToken": "29b6bb2d"
+"phoneToken": "530260a3"
 }

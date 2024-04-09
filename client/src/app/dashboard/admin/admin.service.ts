@@ -13,8 +13,10 @@ export class AdminService {
 
   fetchUsers(): Observable<ListUsersResponse> {
     return this.http.get<ListUsersResponse>('/users').pipe(
-        map(response => response),
-        tap(console.log)
+      catchError((error: HttpErrorResponse) => {
+        this.toast.error(error.error.message)
+        return []
+      })
     )
   }
 

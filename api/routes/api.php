@@ -20,6 +20,8 @@ use App\Http\Controllers\AuthController;
 |
 */
 
+
+
 Route::middleware('auth:sanctum')->get('/user', function (Request $request) {
     return $request->user()->load('roles');
 });
@@ -44,8 +46,8 @@ Route::prefix('mobile')->group(function () {
     Route::post('/verify-token', [MobileAuthController::class, 'generateToken'])->middleware(['auth:sanctum']);
 });
 
-Route::get('/assigned-tasks', [GuestController::class, 'listAssignedTasks'])->middleware(['auth:sanctum']);
-Route::post('/done/{taskID}', [GuestController::class, 'markAsDone'])->name('done-task')->middleware('signed');
+Route::get('/assigned-tasks', [GuestController::class, 'listAssignedTasks'])->middleware(['auth:sanctum', 'roles:guest', 'active']);
+Route::put('/done/{taskID}', [GuestController::class, 'markAsDone'])->name('done-task')->middleware('signed', 'active');
 
 Route::controller(CoordinatorController::class)->group(function () {
     Route::get('/tasks', 'listTasks');
@@ -53,15 +55,16 @@ Route::controller(CoordinatorController::class)->group(function () {
     Route::get('/guests', 'listGuests');
     Route::put('/tasks/{taskID}', 'updateTask')->middleware('signed')->name('update-task');
     Route::delete('/tasks/{taskID}', 'deleteTask')->middleware('signed')->name('delete-task');
-})->middleware(['auth:sanctum']);
+})->middleware(['auth:sanctum', 'roles:coordinator', 'active']);
 
-Route::controller(UserManagementController::class)->group(function () {
+Route::middleware(['auth:sanctum', 'private', 'roles:admin', 'private'])->controller(UserManagementController::class)->group(function () {
     Route::get('/users', 'listUsers');
     Route::delete('/users/{userID}', 'disableUser')
         ->middleware('signed')->name('disable-user');
     Route::put('/users/{userID}', 'enableUser')
         ->middleware('signed')->name('enable-user');
-})->middleware(['auth:sanctum', 'roles:admin']);
+});
+
 
 Route::fallback(function () {
     return response()->json(['message' => 'Not Found'], 404);

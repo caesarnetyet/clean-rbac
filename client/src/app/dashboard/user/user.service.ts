@@ -15,8 +15,9 @@ export class UserService {
   listAssignedTasks(): Observable<any> {
     return this.http.get<any>('/assigned-tasks').pipe(
         catchError(err => {
+          console.log(err)
           this.toast.error(err.error.message)
-          return err
+          return []
         })
     )
   }
