@@ -1,21 +1,28 @@
-<div class="container-section">
-    @for (task of tasks$ | async; track task) {
-    <mat-card>
-        <mat-card-content>
-            <p>{{task.title}}</p>
-            <p>{{task.body}}</p>
-            <p></p>
-        </mat-card-content>
-        <mat-card-actions>
-        @if (task.doneURL){
-            <button mat-button (click)="markAsDone(task.doneURL)">
-                MARCAR TAREA COMO HECHA
-            </button>
-        } @else {
-        <p>Tarea realizada a las :{{task.doneAt | date:'shortTime'}}</p>
-        }
+<div class="container">
+    @defer {
+        @for (task of tasks$(); track task.id) {
+            <mat-card>
+                <mat-card-content>
+                    <h1>{{task.title}}</h1>
+                    <p>{{task.body}}</p>
+                    <p></p>
+                </mat-card-content>
+                <mat-card-actions>
+                    @if (task.doneURL){
+                        <button mat-button (click)="markAsDone(task.doneURL)">
+                            MARCAR TAREA COMO HECHA
+                        </button>
+                    } @else {
+                        <p>Tarea realizada a las :{{task.doneAt | date:'shortTime'}}</p>
+                    }
 
-        </mat-card-actions>
-    </mat-card>
-     }
+                </mat-card-actions>
+            </mat-card>
+        }
+    } @loading () {
+        <mat-spinner ></mat-spinner>
+    } @error {
+        <p>Ha ocurrido un error</p>
+    }
+
 </div>

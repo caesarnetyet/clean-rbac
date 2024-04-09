@@ -1,0 +1,18 @@
+.container {
+    padding: 4em;
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(450px, 1fr));
+    gap: 2em;
+}
+
+mat-card-content {
+    padding: 15px;
+}
+
+mat-card-actions {
+    text-align: right; /* Align buttons to the right */
+}
+
+button {
+    margin-left: 10px;  /* Spacing between buttons */
+}

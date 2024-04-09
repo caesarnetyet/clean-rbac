@@ -46,16 +46,18 @@ Route::prefix('mobile')->group(function () {
     Route::post('/verify-token', [MobileAuthController::class, 'generateToken'])->middleware(['auth:sanctum']);
 });
 
-Route::get('/assigned-tasks', [GuestController::class, 'listAssignedTasks'])->middleware(['auth:sanctum', 'roles:guest', 'active']);
-Route::put('/done/{taskID}', [GuestController::class, 'markAsDone'])->name('done-task')->middleware('signed', 'active');
+Route::middleware(['auth:sanctum', 'roles:guest', 'active'])->group(function () {
+    Route::get('/assigned-tasks', [GuestController::class, 'listAssignedTasks']);
+    Route::put('/done/{taskID}', [GuestController::class, 'markAsDone'])->name('done-task')->middleware('signed', 'active');
+});
 
-Route::controller(CoordinatorController::class)->group(function () {
+Route::middleware(['auth:sanctum', 'roles:guest', 'active'])->controller(CoordinatorController::class)->group(function () {
     Route::get('/tasks', 'listTasks');
     Route::post('/tasks', 'storeTask');
     Route::get('/guests', 'listGuests');
     Route::put('/tasks/{taskID}', 'updateTask')->middleware('signed')->name('update-task');
     Route::delete('/tasks/{taskID}', 'deleteTask')->middleware('signed')->name('delete-task');
-})->middleware(['auth:sanctum', 'roles:coordinator', 'active']);
+});
 
 Route::middleware(['auth:sanctum', 'private', 'roles:admin', 'private'])->controller(UserManagementController::class)->group(function () {
     Route::get('/users', 'listUsers');

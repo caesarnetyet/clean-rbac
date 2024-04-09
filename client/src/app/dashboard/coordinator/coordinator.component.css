@@ -1,12 +1,11 @@
-.containerdash{
-    max-width: 1240px;
-    width: 85%;
-    padding: 40px 0;
-    margin: auto;
-    display: flex;
-    flex-direction: column;
-    justify-content: center;
-    min-height: 50vh;
+.header {
+    padding:  1em 4em;
+}
+.container {
+    padding: 0 4em;
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(450px, 1fr));
+    gap: 2em;
 }
 .buttonWidth{
     width: 50%;

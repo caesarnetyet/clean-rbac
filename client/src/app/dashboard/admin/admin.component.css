@@ -1,6 +1,8 @@
-mat-card {
-    max-width: 450px; /* Adjust width as needed */
-    margin: 20px auto;  /* Center the card */
+.container {
+    padding: 4em;
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(450px, 1fr));
+    gap: 2em;
 }
 
 mat-card-content {
@@ -13,4 +15,4 @@ mat-card-actions {
 
 button {
     margin-left: 10px;  /* Spacing between buttons */
-} 
+}

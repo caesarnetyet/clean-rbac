@@ -1,5 +1,6 @@
 import {AsyncPipe} from "@angular/common";
 import {Component, Inject, inject} from '@angular/core';
+import {MatProgressSpinner} from "@angular/material/progress-spinner";
 import {ToastService} from "../../common/services/toast/toast.service";
 import {CoordinatorService} from "./coordinator.service";
 import {MatButton, MatButtonModule} from '@angular/material/button';
@@ -15,7 +16,7 @@ import { RouterLink, RouterOutlet } from "@angular/router";
   imports: [
     RouterOutlet,
     AsyncPipe,
-    MatCardModule, MatButtonModule, MatButton, MatCard, RouterLink
+    MatCardModule, MatButtonModule, MatButton, MatCard, RouterLink, MatProgressSpinner
   ],
   templateUrl: './coordinator.component.html',
   styleUrl: './coordinator.component.css'
@@ -24,9 +25,6 @@ export class CoordinatorComponent {
   private service = inject(CoordinatorService)
   private toast = inject(ToastService)
   tasks$ = this.service.listTasks()
-  userGuests = this.service.fetchUsers()
-
-  ngOnInit() { }
 
   deleteTask(deleteUrl: string) {
     this.service.deleteTask(deleteUrl)

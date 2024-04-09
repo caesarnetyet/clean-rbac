@@ -1,8 +1,10 @@
-<div class="containerdash">
-    <p>coordinator works!</p>
-
+<div class="header">
     <h2>Administrar Tareas</h2>
     <button mat-raised-button color="primary" (click)="abrirFormulario('nuevo')" class="buttonWidth">Agregar Nueva Tarea</button>
+</div>
+
+<div class="container">
+    @defer {
     @for (task of tasks$ | async; track task) {
         <mat-card class="cardTask">
             <mat-card-header>
@@ -15,5 +17,12 @@
                 <button mat-button (click)="deleteTask(task.deleteUrl)" type="button">ELIMINAR</button>
             </mat-card-actions> 
         </mat-card>
+    }
+    } @loading (minimum 1s) {
+        <mat-spinner ></mat-spinner>
+    } @error {
+        <div class="error">
+            <p>No se pudieron obtener las tareas</p>
+        </div>
     }
 </div>

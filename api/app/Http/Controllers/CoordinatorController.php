@@ -49,6 +49,7 @@ class CoordinatorController extends Controller
                 'title.required' => 'El título es requerido',
                 'body.required' => 'El cuerpo es requerido',
                 'guest_id.required' => 'El invitado es requerido',
+                'guest_id.integer' => 'El invitado no fue enviado correctamente'
             ]
         );
 

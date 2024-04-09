@@ -20,8 +20,8 @@ export class CoordinatorService {
     return this.http.get('/tasks').pipe(
         map((res: any) => res.data),
         catchError(err => {
-          this.toast.error(err)
-          return err
+          this.toast.error(err.error.message)
+          return []
         })
     )
   }

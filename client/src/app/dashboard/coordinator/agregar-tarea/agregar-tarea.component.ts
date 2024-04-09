@@ -111,13 +111,6 @@ export class AgregarTareaComponent {
     }
   }  
   
- 
-  handleServerValidationErrors(errors: TaskNewValidationErrors) {
-    for (const key in errors) {
-        this.tasknewForm.get(key)?.setErrors({server: errors[key]})
-    }
-  }
-
   cancelar(): void {
     this.dialogRef.close();
   }

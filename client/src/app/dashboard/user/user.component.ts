@@ -1,36 +1,43 @@
-import { Component, inject } from '@angular/core';
+import {Component, inject, OnInit, signal} from '@angular/core';
+import {MatButton} from "@angular/material/button";
 import { MatCard, MatCardModule } from '@angular/material/card';
+import {MatProgressSpinner} from "@angular/material/progress-spinner";
 import { UserService } from './user.service';
 import { AsyncPipe, DatePipe, NgIf } from '@angular/common';
-import { ToastService } from '../../common/services/toast/toast.service';
-import { map, Observable } from 'rxjs';
+import { map, switchMap} from 'rxjs';
 
 @Component({
   selector: 'app-user',
   standalone: true,
   imports: [
-    MatCard, MatCardModule, AsyncPipe, NgIf, DatePipe
+    MatCard,
+    MatCardModule,
+    AsyncPipe,
+    NgIf, DatePipe, MatButton, MatProgressSpinner,
+    MatButton
   ],
   templateUrl: './user.component.html',
   styleUrl: './user.component.css'
 })
-export class UserComponent {
+export class UserComponent implements OnInit{
   service = inject(UserService);
-  private toast = inject(ToastService)
-  tasks$: Observable<any> = this.service.listAssignedTasks().pipe(
-    map(data => data.data)
-  )
+  tasks$ = signal([] as any[]);
 
-
-  
-
-  markAsDone(signedURL: string) {
-      this.service.markAsDone(signedURL)
-          .subscribe(() => this.refreshTask())
+  ngOnInit() {
+    this.service.listAssignedTasks().pipe(
+        map(data => data.data)
+    ).subscribe(tasks => {
+      this.tasks$.set(tasks)
+    })
   }
 
-  refreshTask() {
- this.tasks$ = this.service.listAssignedTasks().pipe()
-}
+  markAsDone(signedURL: string) {
+    this.service.markAsDone(signedURL).pipe(
+        switchMap(() => this.service.listAssignedTasks()),
+        map(data => data.data)
+    ).subscribe(updatedTasks => {
+        this.tasks$.set(updatedTasks)
+    });
+  }
 
 }

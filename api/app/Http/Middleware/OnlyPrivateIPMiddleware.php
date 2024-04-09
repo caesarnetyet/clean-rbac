@@ -18,9 +18,9 @@ class OnlyPrivateIPMiddleware
      */
     public function handle(Request $request, Closure $next): Response
     {
-        $allowedIpRange = '10.8.0.1/24';
+        $allowedIpRange = ['10.8.0.1/24', '127.0.0.1'];
         if (!IpUtils::checkIp($request->ip(), $allowedIpRange)) {
-            return response()->json(['message' => 'Acceso denegado'], 401);
+            return response()->json(['message' => 'Acceso restringido, utiliza la red privada.'], 401);
         }
 
         return $next($request);
