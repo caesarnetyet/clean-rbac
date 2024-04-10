@@ -14,13 +14,15 @@ use Illuminate\Support\Facades\Mail;
 class ProcessAdminAuthentication implements ShouldQueue
 {
     use Dispatchable, InteractsWithQueue, Queueable, SerializesModels;
-
+    private User $user;
     /**
      * Create a new job instance.
      */
-    public function __construct(
-        private User $user
-    ){}
+
+    public function __construct(User $user
+    ){
+        $this->user = $user->withoutRelations();
+    }
 
     public function handle(): void
     {
