@@ -16,10 +16,11 @@ class RoleMiddleware
      */
     public function handle(Request $request, Closure $next, ...$role): Response
     {
-        $user = $request->user();
-        
-        Log::info($user);
-        
+        $userRole = $request->user()->roles()->first()->name;
+
+        if (!in_array($userRole, $role)) {
+            return response()->json(['message' => 'No tienes permisos para acceder a este recurso.'], 403);
+        }
 
         return $next($request);
     }

@@ -42,8 +42,8 @@ Route::get('/logout', [AuthController::class, 'logout'])->middleware('auth:sanct
 Route::post('/register', [AuthController::class, 'register']);
 
 Route::prefix('mobile')->group(function () {
-    Route::post('/login', [LGController::class, 'login']);
-    Route::post('/verify-token', [MobileAuthController::class, 'generateToken'])->middleware(['auth:sanctum']);
+    Route::post('/login', [LGController::class, 'login'])->middleware(['private']);
+    Route::post('/verify-token', [MobileAuthController::class, 'generateToken'])->middleware(['auth:sanctum', 'private']);
 });
 
 Route::middleware(['auth:sanctum', 'roles:guest', 'active'])->group(function () {
@@ -51,7 +51,7 @@ Route::middleware(['auth:sanctum', 'roles:guest', 'active'])->group(function () 
     Route::put('/done/{taskID}', [GuestController::class, 'markAsDone'])->name('done-task')->middleware('signed', 'active');
 });
 
-Route::middleware(['auth:sanctum', 'roles:guest', 'active'])->controller(CoordinatorController::class)->group(function () {
+Route::middleware(['auth:sanctum', 'roles:coordinator', 'active'])->controller(CoordinatorController::class)->group(function () {
     Route::get('/tasks', 'listTasks');
     Route::post('/tasks', 'storeTask');
     Route::get('/guests', 'listGuests');
