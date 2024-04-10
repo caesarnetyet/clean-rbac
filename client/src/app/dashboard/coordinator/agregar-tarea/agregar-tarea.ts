@@ -1,10 +1,9 @@
-import { int } from "nerdamer";
-
 export interface AgregarTareaRequest {
     title: string;
     body: string;
-    user_id: int;
+    user_id: number;
 }
+
 export interface User {
   id: number;
   name: string;
